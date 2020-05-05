@@ -15,6 +15,8 @@ using Facebook;
 using System.Threading;
 using System.Collections;
 
+
+
 namespace DDCBot6000
 {
 
@@ -22,7 +24,7 @@ namespace DDCBot6000
     {
         private const string FB_IMAGE_ADDRESS = "https://graph.facebook.com/v6.0/me/photos";
         private const string FB_BASE_ADDRESS = "https://graph.facebook.com/";
-        private const string FB_PAGE_ID = "107789687591192";
+        public const string FB_PAGE_ID = "107789687591192";
         private string fB_ACCESS_TOKEN;
 
         public string FB_ACCESS_TOKEN { get => fB_ACCESS_TOKEN; set => fB_ACCESS_TOKEN = value; }
@@ -68,7 +70,9 @@ namespace DDCBot6000
     {
         static void Main(string[] args)
         {
+            FacebookClient api = new FacebookClient();
 
+           
             string token;
             string imageSource = "";
             string caption = "";
@@ -92,47 +96,32 @@ namespace DDCBot6000
 
 
             MatchSimulation newMatch = new MatchSimulation();
+            string path = @"C:\Users\Scooby2\Desktop\mon_real.jpg";
 
-            //Console.WriteLine("\n---Now simulating Monarcas v. LA FC Matches---");
-            //Console.WriteLine("Difference = 0.05 - Probability: 50% per team\n");
+            for (int i = 0; i < 3; i++)
+            {
+                Console.WriteLine($"\n---Now simulating {teamList[i].TeamName} v. {teamList[i + 1].TeamName}---");
+                caption = newMatch.simulateMatch(teamList[i].TeamName, teamList[i + 1].TeamName, teamList[i].TeamStrength, teamList[i + 1].TeamStrength);
 
-            //newMatch.simulateMatch(teamList[0].TeamName, teamList[2].TeamName, teamList[0].TeamStrength, teamList[2].TeamStrength);
+                Console.WriteLine("\nMatch Result: " + caption);
 
-            //for (int i = 0; i < 10; i++)
-            //{
-            //    newMatch.simulateMatch(teamList[0].TeamName, teamList[2].TeamName, teamList[0].TeamStrength, teamList[2].TeamStrength);
-            //}
+                if (i == 0)
+                {                              
+                    DDCBot send = new DDCBot();
+                    send.postToFbImage(BotPost.FB_PAGE_ID, token, path, caption);
+                }
+                else
+                {
+                   DDCBot send = new DDCBot();
+                    send.postToFbText(token, caption);
+                }
+             
+                string time = DateTime.Now.ToString("t");
 
-            Console.WriteLine("\n---Now simulating C.D. Olimpia v. Real Madrid Matches---");
-            Console.WriteLine("Difference = 0.71 - Probability: 85% Real Madrid - 15% C.D. Olimpia\n");
-
-            string post = newMatch.simulateMatch(teamList[1].TeamName, teamList[4].TeamName, teamList[1].TeamStrength, teamList[4].TeamStrength);
-
-
-            //for (int i = 0; i < 10; i++)
-            //{
-            //    newMatch.simulateMatch(teamList[1].TeamName, teamList[4].TeamName, teamList[1].TeamStrength, teamList[4].TeamStrength);
-            //}
-
-
-            DDCBot send = new DDCBot();
-            send.postToFbText(token, post);
-
-            Console.WriteLine("\nMatch simulation has been posted!");
-
-            //Console.WriteLine("\n----Now Listing All Teams----\n");
-            //foreach(Team value in teamList)
-            //{
-            //    Console.WriteLine("Name: "+value.TeamName);
-            //    Console.WriteLine("League: "+value.TeamLeague);
-            //    Console.WriteLine("Strength: " + value.TeamStrength + "\n");
-
-            //    //Console.WriteLine("----Team Roster---");
-            //    //foreach(string item in value.TeamRoster)
-            //    //{
-            //    //    Console.WriteLine("-"+ item + "\n");
-            //    //}
-            //}
+                Console.WriteLine($"\nMatch simulation has been posted to Facebook @ {time}. Next simulation will be run in 5 minutes...");
+                Thread.Sleep(300000);
+            }
+         
         }
 
         void postToFbText(string token, string caption)
@@ -153,23 +142,36 @@ namespace DDCBot6000
             }
         }
 
-
-        void postToFbImage(string token, string caption, string imageSource)
+        public string postToFbImage(string id, string accessToken, string filePath, string caption)
         {
+            var mediaObject = new FacebookMediaObject
+            {
+                FileName = System.IO.Path.GetFileName(filePath),
+                ContentType = "image/jpeg"
+            };
+
+            mediaObject.SetValue(System.IO.File.ReadAllBytes(filePath));
+
             try
             {
-                BotPost post = new BotPost();
-                post.FB_ACCESS_TOKEN = token;
-                Task.Run(async () =>
-                {
-                    await post.PublishImageAndMessage(caption, imageSource);
-                }).GetAwaiter().GetResult();
+                var fb = new FacebookClient(accessToken);
+
+                var result = (IDictionary<string, object>)fb.Post(id + "/photos", new Dictionary<string, object>
+                                   {
+                                       { "source", mediaObject },
+                                       { "message", caption }
+                                   });
+
+                var postId = (string)result["id"];
+
                 Console.WriteLine("DDCBot6000 - Post completed succesfully! uwu");
+                return postId;
             }
-            catch (Exception)
+            catch (FacebookApiException ex)
             {
                 Console.WriteLine("An error ocurred, try again or try another token! unu");
+                throw;
             }
-        }
+        }       
     }
 }

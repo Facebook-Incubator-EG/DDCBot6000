@@ -47,8 +47,8 @@ namespace DDCBot6000
              
                 int result = rnd.Next(0, 100) < winChance ? 1 : 0;
 
-                if (result == 1) { return ($"---Match Simulation---\n{team1} vs. {team2} - {team1} wins!"); }
-                else { return($"---Match Simulation---\n{team1} vs. {team2} - {team2} wins!"); }
+                if (result == 1) { return ($"---Match Simulation---\n{team1} vs. {team2} - {team1} wins! \nScore: unkonwn - unknown"); }
+                else { return($"---Match Simulation---\n{team1} vs. {team2} - {team2} wins! \nScore: unkonwn - unknown"); }
             }
             else
             {
@@ -64,8 +64,8 @@ namespace DDCBot6000
 
                 int result = rnd.Next(0, 100) < winChance ? 1 : 0;
 
-                if (result == 1) {return($"---Match Simulation---\n{team1} vs. {team2} - {team1} wins!");}
-                else {return($"---Match Simulation---\n{team1} vs. {team2} - {team2} wins!");}
+                if (result == 1) {return($"---Match Simulation---\n{team1} vs. {team2} - {team1} wins! \nScore: unkonwn - unknown");}
+                else {return($"---Match Simulation---\n{team1} vs. {team2} - {team2} wins! \nScore: unkonwn - unknown");}
             }
         }      
     }
