@@ -44,7 +44,7 @@ namespace DDCBot6000
         /// Takes 4 parameters, 2 strings for team name and 2 integers for team strength
         /// Calculate the team difference against highest strength team and set winning chance
         /// Generate random outcomes based on said difference and probability
-        /// 100% bug free, I swear you won't find a more efficient way to simulate football matches ;) 
+        /// 100% bug free, I swear you won't find a more efficient way to simulate football matches. Trust me, I went to college ;) 
         /// </remarks>
         public string simulateMatch(string team1, string team2, int str1, int str2)
         {
@@ -60,7 +60,7 @@ namespace DDCBot6000
 
             Random rnd = new Random(Guid.NewGuid().GetHashCode());
 
-            if (difference >= 70 && difference <= 100) { winChance = 95; st1 = rnd.Next(0, 12); st2 = rnd.Next(0, 1); }
+            if (difference >= 70 && difference <= 100)    { winChance = 95; st1 = rnd.Next(0, 12); st2 = rnd.Next(0, 1);}
             else if (difference >= 50 && difference < 70) { winChance = 75; st1 = rnd.Next(0, 9); st2 = rnd.Next(0, 2); }
             else if (difference >= 30 && difference < 50) { winChance = 70; st1 = rnd.Next(0, 7); st2 = rnd.Next(0, 3); }
             else if (difference >= 10 && difference < 30) { winChance = 55; st1 = rnd.Next(0, 6); st2 = rnd.Next(0, 4); }
