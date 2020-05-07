@@ -35,7 +35,7 @@
             this.lblValidToken = new System.Windows.Forms.Label();
             this.rctConsoleOutput = new System.Windows.Forms.RichTextBox();
             this.btnRandomSim = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
+            this.btnBeginSims = new System.Windows.Forms.Button();
             this.lblQck = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -140,9 +140,11 @@
             this.rctConsoleOutput.Size = new System.Drawing.Size(603, 462);
             this.rctConsoleOutput.TabIndex = 6;
             this.rctConsoleOutput.Text = "";
+            this.rctConsoleOutput.TextChanged += new System.EventHandler(this.rctConsoleOutput_TextChanged);
             // 
             // btnRandomSim
             // 
+            this.btnRandomSim.Enabled = false;
             this.btnRandomSim.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnRandomSim.Location = new System.Drawing.Point(12, 199);
             this.btnRandomSim.Name = "btnRandomSim";
@@ -152,15 +154,16 @@
             this.btnRandomSim.UseVisualStyleBackColor = true;
             this.btnRandomSim.Click += new System.EventHandler(this.btnRandomSim_Click);
             // 
-            // button1
+            // btnBeginSims
             // 
-            this.button1.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button1.Location = new System.Drawing.Point(352, 503);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(144, 39);
-            this.button1.TabIndex = 8;
-            this.button1.Text = "Begin Simulations";
-            this.button1.UseVisualStyleBackColor = true;
+            this.btnBeginSims.Enabled = false;
+            this.btnBeginSims.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnBeginSims.Location = new System.Drawing.Point(352, 503);
+            this.btnBeginSims.Name = "btnBeginSims";
+            this.btnBeginSims.Size = new System.Drawing.Size(144, 39);
+            this.btnBeginSims.TabIndex = 8;
+            this.btnBeginSims.Text = "Begin Simulations";
+            this.btnBeginSims.UseVisualStyleBackColor = true;
             // 
             // lblQck
             // 
@@ -401,6 +404,7 @@
             // btnStop
             // 
             this.btnStop.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnStop.Enabled = false;
             this.btnStop.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnStop.Location = new System.Drawing.Point(1029, 167);
             this.btnStop.Name = "btnStop";
@@ -462,7 +466,7 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.lblQck);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.btnBeginSims);
             this.Controls.Add(this.btnRandomSim);
             this.Controls.Add(this.rctConsoleOutput);
             this.Controls.Add(this.lblValidToken);
@@ -473,7 +477,7 @@
             this.MinimumSize = new System.Drawing.Size(816, 559);
             this.Name = "frmMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "DDCBot6000 v1.0";
+            this.Text = "DDCBot6000 v1.0 - Control Panel";
             this.Load += new System.EventHandler(this.frmMain_Load);
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
@@ -493,7 +497,7 @@
         private System.Windows.Forms.Label lblValidToken;
         private System.Windows.Forms.RichTextBox rctConsoleOutput;
         private System.Windows.Forms.Button btnRandomSim;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnBeginSims;
         private System.Windows.Forms.Label lblQck;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;

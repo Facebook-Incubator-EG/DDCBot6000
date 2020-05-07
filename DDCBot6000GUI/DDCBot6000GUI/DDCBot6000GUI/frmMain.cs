@@ -17,6 +17,8 @@ namespace DDCBot6000GUI
     {
 
         public string FB_TOKEN = "";
+        public const string APP_TOKEN = "267848907911398|Tcxw4cGfvbLD92wOjfXQRRaAJnk";
+        public string apiResponse = "";
         public bool simStop = false;
 
         public frmMain()
@@ -29,6 +31,20 @@ namespace DDCBot6000GUI
 
         }
 
+
+        public bool validateToken(string token)
+        {
+            try
+            {
+                var fb = new FacebookClient(token);
+                apiResponse = fb.Get($"/debug_token?input_token={token}").ToString();
+                return true;
+            }
+            catch(FacebookApiException)
+            {            
+                return false;
+            }
+        }
 
         void quickMatch()
         {
@@ -47,10 +63,8 @@ namespace DDCBot6000GUI
 
             for (int i = 0; i < 10; i++)
             {
-                Console.WriteLine($"\n---Now simulating {teamList[0].TeamName} v. {teamList[2].TeamName}---");
                 rctConsoleOutput.AppendText(Environment.NewLine + $"---Now simulating {teamList[0].TeamName} v. {teamList[2].TeamName}---");
-                caption = newMatch.simulateMatch(teamList[0].TeamName, teamList[2].TeamName, teamList[0].TeamStrength, teamList[2].TeamStrength);
-                Console.WriteLine("\nMatch Result: " + caption + "\nSimulation finished at: " + DateTime.Now.ToString("h:mm:ss:ffff tt"));           
+                caption = newMatch.simulateMatch(teamList[0].TeamName, teamList[2].TeamName, teamList[0].TeamStrength, teamList[2].TeamStrength);          
                 rctConsoleOutput.AppendText(Environment.NewLine + "\nMatch Result: " + caption + "\nSimulation finished at: " + DateTime.Now.ToString("h:mm:ss:ffff tt\n"));
             }
         }
@@ -66,12 +80,10 @@ namespace DDCBot6000GUI
                 {
                     await post.PublishMessage(caption);
                 }).GetAwaiter().GetResult();
-                //Console.WriteLine("DDCBot6000 - Post completed succesfully! uwu");
                 rctConsoleOutput.AppendText(Environment.NewLine + "DDCBot6000 - Post completed succesfully! uwu");
             }
             catch (Exception)
             {
-                //Console.WriteLine("\nAn error ocurred, try again or try another token! UnU");
                 rctConsoleOutput.AppendText(Environment.NewLine + "An error ocurred, try again or try another token! UnU");
             }
         }
@@ -98,14 +110,11 @@ namespace DDCBot6000GUI
 
                 var postId = (string)result["id"];
 
-                //Console.WriteLine("DDCBot6000 - Post completed succesfully! uwu");
                 rctConsoleOutput.AppendText(Environment.NewLine + "DDCBot600 - Post completed succesfully! uwu");
                 return postId;
             }
             catch (FacebookApiException ex)
             {
-                //Console.WriteLine("\nAn error ocurred, try again or try another token! UnU " +
-                //    "\n\n-------------Facebook Exception Details-------------");
                 rctConsoleOutput.AppendText(Environment.NewLine + "\nAn error ocurred, try again or try another token! UnU " +
                     "\n\n-------------Facebook Exception Details-------------");
                 throw;
@@ -147,13 +156,9 @@ namespace DDCBot6000GUI
             for (int i = 2; i < 3; i++)
             {
                 rctConsoleOutput.AppendText(Environment.NewLine + $"\n---Now simulating {teamList[i].TeamName} v. {teamList[i+1].TeamName}---");
-
                 caption = newMatch.simulateMatch(teamList[i].TeamName, teamList[i + 1].TeamName, teamList[i].TeamStrength, teamList[i + 1].TeamStrength);
-
                 rctConsoleOutput.AppendText(Environment.NewLine + "Match Result: " + caption);
-
                 rctConsoleOutput.AppendText(Environment.NewLine + "Attempting to post to Facebook...");
-
 
                 postToFbText(token, caption);
 
@@ -180,8 +185,26 @@ namespace DDCBot6000GUI
 
         private void btnSubmitToken_Click(object sender, EventArgs e)
         {
+            if (txtAccessToken.Text == "") { rctConsoleOutput.Text = "Token entered is blank! Try again."; return; }
             FB_TOKEN = txtAccessToken.Text.Trim();
-            lblValidToken.Visible = true;
+            bool validation = validateToken(FB_TOKEN);
+
+            if(validation == true)
+            {               
+                lblValidToken.Visible = true;
+                btnRandomSim.Enabled = true;
+                btnStop.Enabled = true;
+                btnBeginSims.Enabled = true;
+                rctConsoleOutput.Text = $"{apiResponse} \n\n Token Accepted UwU!";
+            }
+            else
+            {
+                rctConsoleOutput.Text = $"Token entered is invalid!-Try again.";
+                btnRandomSim.Enabled = false;
+                btnStop.Enabled = false;
+                btnBeginSims.Enabled = false;
+            }
+            
         }
 
         private void btnStop_Click(object sender, EventArgs e)
@@ -193,6 +216,12 @@ namespace DDCBot6000GUI
         private void llbaberuwu_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             System.Diagnostics.Process.Start("http://www.github.com/aberuwu");
+        }
+
+        private void rctConsoleOutput_TextChanged(object sender, EventArgs e)
+        {
+            rctConsoleOutput.SelectionStart = rctConsoleOutput.Text.Length;
+            rctConsoleOutput.ScrollToCaret();
         }
     }
 }
