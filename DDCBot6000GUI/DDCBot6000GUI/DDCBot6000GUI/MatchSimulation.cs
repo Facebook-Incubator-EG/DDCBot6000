@@ -91,5 +91,21 @@ namespace DDCBot6000GUI
                 return ($"---Match Simulation---\n{team1} vs. {team2} - Both teams draw! \nScore: {st1} - {st2}");
             }
         }
+
+        ///<remarks> 
+        /// loadTeams
+        /// Loads team information from csv file
+        /// </remarks>
+        public void loadTeams()
+        {
+            List<Team> teamList = new List<Team>();
+            ArrayList roster = new ArrayList();
+            string[] teamNames = { };
+            string[] teamLeagues = { };
+            int[] teamStrength = { };
+
+
+
+        }
     }
 }

@@ -199,7 +199,7 @@ namespace DDCBot6000GUI
             }
             else
             {
-                rctConsoleOutput.Text = $"Token entered is invalid!-Try again.";
+                rctConsoleOutput.Text = $"Token entered is invalid! - Try again.";
                 btnRandomSim.Enabled = false;
                 btnStop.Enabled = false;
                 btnBeginSims.Enabled = false;
