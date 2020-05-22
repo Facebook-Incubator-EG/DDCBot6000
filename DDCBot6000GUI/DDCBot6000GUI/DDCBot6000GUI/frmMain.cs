@@ -21,6 +21,10 @@ namespace DDCBot6000GUI
         public static string apiResponse = "";
         public static bool simStop = false;
 
+        public delegate void delUpdateTextBox(string text);
+        ThreadStart threadStart;
+        Thread myUpdateThread;
+
         public frmMain()
         {
             InitializeComponent();
@@ -67,10 +71,20 @@ namespace DDCBot6000GUI
         {
             btnRandomSim.Enabled = false;
             simStop = false;
-            Task.Run(async () =>
-            {
-                await randSim(FB_TOKEN);
-            });
+
+            threadStart = new ThreadStart(randSim2);
+            myUpdateThread = new Thread(threadStart);
+            //Task.Run(async () =>
+            //{
+            //    await randSim(FB_TOKEN);
+            //});
+        }
+
+
+
+        private void randSim2()
+        {
+
         }
 
         //STILL NEED TO FIX THIS CODE!!!!
@@ -92,32 +106,43 @@ namespace DDCBot6000GUI
 
             for (int i = 2; i < 5; i++)
             {
-                //rctConsoleOutput.AppendText(Environment.NewLine + $"\n---Now simulating {teamList[i].TeamName} v. {teamList[i+1].TeamName}---");
-                caption = newMatch.simulateMatch(teamList[i].TeamName, teamList[i + 1].TeamName, teamList[i].TeamStrength, teamList[i + 1].TeamStrength);
+                //myUpdateThread = new Thread(threadStart);
+                delUpdateTextBox dlu = new delUpdateTextBox(updateTextBox);
+                rctConsoleOutput.BeginInvoke(dlu, Environment.NewLine + $"\n---Now simulating {teamList[i].TeamName} v. {teamList[i + 1].TeamName}---", myUpdateThread);
+                //rctConsoleOutput.AppendText(Environment.NewLine + $"\n---Now simulating {teamList[i].TeamName} v. {teamList[i + 1].TeamName}---");
+                //caption = newMatch.simulateMatch(teamList[i].TeamName, teamList[i + 1].TeamName, teamList[i].TeamStrength, teamList[i + 1].TeamStrength);
                 //rctConsoleOutput.AppendText(Environment.NewLine + "Match Result: " + caption);
                 //rctConsoleOutput.AppendText(Environment.NewLine + "Attempting to post to Facebook...");
 
                 //postToFbText(token, caption);
+                
 
+                //imagePath = newMatch.generateImage(i, i + 1, MatchSimulation.team1Score, MatchSimulation.team2Score, teamList[i].TeamName, teamList[i + 1].TeamName);
 
-                imagePath = newMatch.generateImage(i, i+1, MatchSimulation.team1Score, MatchSimulation.team2Score, teamList[i].TeamName, teamList[i+1].TeamName);
+                //BotPost newPost = new BotPost();
 
-                BotPost newPost = new BotPost();
-
-                newPost.postToFbImage(BotPost.FB_PAGE_ID, token, imagePath, caption);
-
+                //newPost.postToFbImage(BotPost.FB_PAGE_ID, token, imagePath, caption);
 
                 string time = DateTime.Now.ToString("h:mm:ss:ffff tt");
-        
-                rctConsoleOutput.AppendText(Environment.NewLine + $"Match simulation has been posted to Facebook @ {time}. Next simulation will be run in 3 minute(s)...");
-                if (i == 5) {break;}
-                await Task.Delay(180000);
-                if (simStop == true){ rctConsoleOutput.AppendText($"\n\nSimulation Terminated @{DateTime.Now.ToString("h:mm:ss:ff tt")}"); btnRandomSim.Enabled = true;  break;}
+
+                //rctConsoleOutput.AppendText(Environment.NewLine + $"Match simulation has been posted to Facebook @ {time}. Next simulation will be run in 1 minute(s)...");
+                if (i == 5) { break; }
+                await Task.Delay(10000);
+                if (simStop == true) { rctConsoleOutput.AppendText($"\n\nSimulation Terminated @{DateTime.Now.ToString("h:mm:ss:ff tt")}"); btnRandomSim.Enabled = true; break; }
+
+
             }
 
             rctConsoleOutput.AppendText(Environment.NewLine + "\n---All simulations completed---");
             btnRandomSim.Enabled = true;
         }
+
+
+        public void updateTextBox(string txt)
+        {
+            this.rctConsoleOutput.AppendText(txt);
+        }
+
 
         private void btnSubmitToken_Click(object sender, EventArgs e)
         {
