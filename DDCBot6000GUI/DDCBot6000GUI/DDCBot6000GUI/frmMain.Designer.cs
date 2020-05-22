@@ -496,7 +496,6 @@
         private System.Windows.Forms.Button btnSubmitToken;
         private System.Windows.Forms.Button btnQuickSim;
         private System.Windows.Forms.Label lblValidToken;
-        private System.Windows.Forms.RichTextBox rctConsoleOutput;
         private System.Windows.Forms.Button btnRandomSim;
         private System.Windows.Forms.Button btnBeginSims;
         private System.Windows.Forms.Label lblQck;
@@ -521,6 +520,7 @@
         private System.Windows.Forms.Button btnStop;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.LinkLabel llbaberuwu;
+        public System.Windows.Forms.RichTextBox rctConsoleOutput;
     }
 }
 

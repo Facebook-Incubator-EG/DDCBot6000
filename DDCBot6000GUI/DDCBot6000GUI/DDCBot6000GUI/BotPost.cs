@@ -41,7 +41,7 @@ namespace DDCBot6000GUI
             }
         }
 
-        public async Task<string> PublishImageAndMessage(string caption, string image)
+        public async Task<string> PublishImageAndMessageManual(string caption, string image)
         {
             using (var httpClient = new HttpClient())
             {
@@ -58,5 +58,56 @@ namespace DDCBot6000GUI
                 return await msg.Content.ReadAsStringAsync();
             }
         }
+
+        public string postToFbImage(string id, string accessToken, string filePath, string caption)
+        {
+            var mediaObject = new FacebookMediaObject
+            {
+                FileName = System.IO.Path.GetFileName(filePath),
+                ContentType = "image/jpeg"
+            };
+
+            mediaObject.SetValue(System.IO.File.ReadAllBytes(filePath));
+
+            try
+            {
+                var fb = new FacebookClient(accessToken);
+
+                var result = (IDictionary<string, object>)fb.Post(id + "/photos", new Dictionary<string, object>
+                                   {
+                                       { "source", mediaObject },
+                                       { "message", caption }
+                                   });
+
+                var postId = (string)result["id"];
+
+                frmMain frm = new frmMain();
+                frm.rctConsoleOutput.AppendText(Environment.NewLine + "DDCBot600 - Post completed succesfully! uwu");
+                return postId;
+            }
+            catch (FacebookApiException ex)
+            {
+                frmMain frm = new frmMain();
+                frm.rctConsoleOutput.AppendText(Environment.NewLine + "\nAn error ocurred, try again or try another token! UnU " +
+                    "\n\n-------------Facebook Exception Details-------------");
+                throw;
+
+            }
+        }
+
+        public bool validateToken(string token)
+        {
+            try
+            {
+                var fb = new FacebookClient(token);
+                frmMain.apiResponse = fb.Get($"/debug_token?input_token={token}").ToString();
+                return true;
+            }
+            catch(FacebookApiException)
+            {
+                return false;
+            }
+        }
+
     }
 }

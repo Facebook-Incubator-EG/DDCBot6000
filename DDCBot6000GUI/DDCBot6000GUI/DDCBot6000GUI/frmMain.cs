@@ -16,10 +16,10 @@ namespace DDCBot6000GUI
     public partial class frmMain : Form
     {
 
-        public string FB_TOKEN = "";
+        public static string FB_TOKEN = "";
         public const string APP_TOKEN = "267848907911398|Tcxw4cGfvbLD92wOjfXQRRaAJnk";
-        public string apiResponse = "";
-        public bool simStop = false;
+        public static string apiResponse = "";
+        public static bool simStop = false;
 
         public frmMain()
         {
@@ -29,44 +29,6 @@ namespace DDCBot6000GUI
         private void frmMain_Load(object sender, EventArgs e)
         {
 
-        }
-
-
-        public bool validateToken(string token)
-        {
-            try
-            {
-                var fb = new FacebookClient(token);
-                apiResponse = fb.Get($"/debug_token?input_token={token}").ToString();
-                return true;
-            }
-            catch(FacebookApiException)
-            {            
-                return false;
-            }
-        }
-
-        void quickMatch()
-        {
-            string caption = "";
-            List<Team> teamList = new List<Team>();
-            ArrayList roster = new ArrayList();
-
-            teamList.Add(new Team() { TeamName = "Monarcas Morelia", TeamLeague = "Liga MX", TeamStrength = 65, TeamRoster = roster });
-            teamList.Add(new Team() { TeamName = "Real Madrid", TeamLeague = "La Liga", TeamStrength = 92, TeamRoster = roster });
-            teamList.Add(new Team() { TeamName = "LA FC", TeamLeague = "MLS", TeamStrength = 69, TeamRoster = roster });
-            teamList.Add(new Team() { TeamName = "Puntarenas FC", TeamLeague = "Liga FPD", TeamStrength = 99, TeamRoster = roster });
-            teamList.Add(new Team() { TeamName = "C.D. Olimpia", TeamLeague = "LNFPH", TeamStrength = 60, TeamRoster = roster });
-            teamList.Add(new Team() { TeamName = "Juventus", TeamLeague = "Serie A", TeamStrength = 91, TeamRoster = roster });
-
-            MatchSimulation newMatch = new MatchSimulation();
-
-            for (int i = 0; i < 10; i++)
-            {
-                rctConsoleOutput.AppendText(Environment.NewLine + $"---Now simulating {teamList[0].TeamName} v. {teamList[2].TeamName}---");
-                caption = newMatch.simulateMatch(teamList[0].TeamName, teamList[2].TeamName, teamList[0].TeamStrength, teamList[2].TeamStrength);          
-                rctConsoleOutput.AppendText(Environment.NewLine + "\nMatch Result: " + caption + "\nSimulation finished at: " + DateTime.Now.ToString("h:mm:ss:ffff tt\n"));
-            }
         }
 
 
@@ -87,45 +49,18 @@ namespace DDCBot6000GUI
                 rctConsoleOutput.AppendText(Environment.NewLine + "An error ocurred, try again or try another token! UnU");
             }
         }
-
-        public string postToFbImage(string id, string accessToken, string filePath, string caption)
-        {
-            var mediaObject = new FacebookMediaObject
-            {
-                FileName = System.IO.Path.GetFileName(filePath),
-                ContentType = "image/jpeg"
-            };
-
-            mediaObject.SetValue(System.IO.File.ReadAllBytes(filePath));
-
-            try
-            {
-                var fb = new FacebookClient(accessToken);
-
-                var result = (IDictionary<string, object>)fb.Post(id + "/photos", new Dictionary<string, object>
-                                   {
-                                       { "source", mediaObject },
-                                       { "message", caption }
-                                   });
-
-                var postId = (string)result["id"];
-
-                rctConsoleOutput.AppendText(Environment.NewLine + "DDCBot600 - Post completed succesfully! uwu");
-                return postId;
-            }
-            catch (FacebookApiException ex)
-            {
-                rctConsoleOutput.AppendText(Environment.NewLine + "\nAn error ocurred, try again or try another token! UnU " +
-                    "\n\n-------------Facebook Exception Details-------------");
-                throw;
-                
-            }
-        }
-
+ 
         private void btnQuickSim_Click(object sender, EventArgs e)
         {
             rctConsoleOutput.Text = "--------------------------------------------";
-            quickMatch();         
+            //quickMatch();    
+            MatchSimulation simulate = new MatchSimulation();
+
+            for(int i = 0; i < 5; i++)
+            {
+                rctConsoleOutput.AppendText(simulate.quickSim(i, i+1));
+
+            }        
         }
 
         private void btnRandomSim_Click(object sender, EventArgs e)
@@ -138,9 +73,11 @@ namespace DDCBot6000GUI
             });
         }
 
+        //STILL NEED TO FIX THIS CODE!!!!
         private async Task randSim(string token)
         {
             string caption;
+            string imagePath;
             List<Team> teamList = new List<Team>();
             MatchSimulation newMatch = new MatchSimulation();
             ArrayList roster = new ArrayList();
@@ -153,29 +90,28 @@ namespace DDCBot6000GUI
             teamList.Add(new Team() { TeamName = "Juventus", TeamLeague = "Serie A", TeamStrength = 91, TeamRoster = roster });
 
 
-            for (int i = 2; i < 3; i++)
+            for (int i = 2; i < 5; i++)
             {
-                rctConsoleOutput.AppendText(Environment.NewLine + $"\n---Now simulating {teamList[i].TeamName} v. {teamList[i+1].TeamName}---");
+                //rctConsoleOutput.AppendText(Environment.NewLine + $"\n---Now simulating {teamList[i].TeamName} v. {teamList[i+1].TeamName}---");
                 caption = newMatch.simulateMatch(teamList[i].TeamName, teamList[i + 1].TeamName, teamList[i].TeamStrength, teamList[i + 1].TeamStrength);
-                rctConsoleOutput.AppendText(Environment.NewLine + "Match Result: " + caption);
-                rctConsoleOutput.AppendText(Environment.NewLine + "Attempting to post to Facebook...");
+                //rctConsoleOutput.AppendText(Environment.NewLine + "Match Result: " + caption);
+                //rctConsoleOutput.AppendText(Environment.NewLine + "Attempting to post to Facebook...");
 
-                postToFbText(token, caption);
+                //postToFbText(token, caption);
 
-                //if (i == 0)
-                //{
-                //    postToFbImage(BotPost.FB_PAGE_ID, token, path, caption);
-                //}
-                //else
-                //{
-                //    postToFbText(token, caption);
-                //}
+
+                imagePath = newMatch.generateImage(i, i+1, MatchSimulation.team1Score, MatchSimulation.team2Score, teamList[i].TeamName, teamList[i+1].TeamName);
+
+                BotPost newPost = new BotPost();
+
+                newPost.postToFbImage(BotPost.FB_PAGE_ID, token, imagePath, caption);
+
 
                 string time = DateTime.Now.ToString("h:mm:ss:ffff tt");
         
-                rctConsoleOutput.AppendText(Environment.NewLine + $"Match simulation has been posted to Facebook @ {time}. Next simulation will be run in 1 minutes...");
+                rctConsoleOutput.AppendText(Environment.NewLine + $"Match simulation has been posted to Facebook @ {time}. Next simulation will be run in 3 minute(s)...");
                 if (i == 5) {break;}
-                await Task.Delay(60000);
+                await Task.Delay(180000);
                 if (simStop == true){ rctConsoleOutput.AppendText($"\n\nSimulation Terminated @{DateTime.Now.ToString("h:mm:ss:ff tt")}"); btnRandomSim.Enabled = true;  break;}
             }
 
@@ -186,8 +122,9 @@ namespace DDCBot6000GUI
         private void btnSubmitToken_Click(object sender, EventArgs e)
         {
             if (txtAccessToken.Text == "") { rctConsoleOutput.Text = "Token entered is blank! Try again."; return; }
+            BotPost validate = new BotPost();
             FB_TOKEN = txtAccessToken.Text.Trim();
-            bool validation = validateToken(FB_TOKEN);
+            bool validation = validate.validateToken(FB_TOKEN);
 
             if(validation == true)
             {               
