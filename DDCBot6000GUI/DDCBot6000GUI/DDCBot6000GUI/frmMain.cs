@@ -1,8 +1,16 @@
-﻿using System;
+﻿///<remarks> 
+/// -Cesar I. Mendoza (aberuwu)
+/// File: frmMain.cs
+/// Purpose: Contains event handlers for the GUI interface of the simbot
+///          
+/// </remarks>
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -35,7 +43,6 @@ namespace DDCBot6000GUI
 
         }
 
-
         void postToFbText(string token, string caption)
         {
             try
@@ -56,15 +63,21 @@ namespace DDCBot6000GUI
  
         private void btnQuickSim_Click(object sender, EventArgs e)
         {
-            rctConsoleOutput.Text = "--------------------------------------------";
-            //quickMatch();    
             MatchSimulation simulate = new MatchSimulation();
+            rctConsoleOutput.Clear();
 
-            for(int i = 0; i < 5; i++)
+            simulate.T1winCount = 0;
+            simulate.T2winCount = 0;
+            simulate.DrawCount = 0;
+            int limit = 1000;
+
+            for(int i = 0; i < limit; i++)
             {
-                rctConsoleOutput.AppendText(simulate.quickSim(i, i+1));
+                rctConsoleOutput.AppendText($"\nSimulation #{i+1} "+simulate.quickSim(3, 5));
+            }
 
-            }        
+            rctConsoleOutput.AppendText($"\n----{limit} simulations were run - Results----"+"\nPuntarenas FC win count: "+ simulate.T1winCount.ToString() + "\nJuventus win count: "
+                + simulate.T2winCount.ToString() + "\nBoth teams drew: " + simulate.DrawCount.ToString());
         }
 
         private void btnRandomSim_Click(object sender, EventArgs e)
@@ -72,30 +85,23 @@ namespace DDCBot6000GUI
             btnRandomSim.Enabled = false;
             simStop = false;
 
-            threadStart = new ThreadStart(randSim2);
-            myUpdateThread = new Thread(threadStart);
-            //Task.Run(async () =>
-            //{
-            //    await randSim(FB_TOKEN);
-            //});
+            Task.Run(async () =>
+            {
+                await RandSim(FB_TOKEN);
+            });
         }
 
-
-
-        private void randSim2()
-        {
-
-        }
-
-        //STILL NEED TO FIX THIS CODE!!!!
-        private async Task randSim(string token)
+        public delegate void InvokeDelegate();
+        private async Task RandSim(string token)
         {
             string caption;
             string imagePath;
             List<Team> teamList = new List<Team>();
             MatchSimulation newMatch = new MatchSimulation();
             ArrayList roster = new ArrayList();
-
+            delUpdateTextBox dlu = new delUpdateTextBox(updateTextBox);
+            BotPost newPost = new BotPost();
+            
             teamList.Add(new Team() { TeamName = "Monarcas Morelia", TeamLeague = "Liga MX", TeamStrength = 65, TeamRoster = roster });
             teamList.Add(new Team() { TeamName = "Real Madrid", TeamLeague = "La Liga", TeamStrength = 92, TeamRoster = roster });
             teamList.Add(new Team() { TeamName = "LA FC", TeamLeague = "MLS", TeamStrength = 69, TeamRoster = roster });
@@ -104,36 +110,37 @@ namespace DDCBot6000GUI
             teamList.Add(new Team() { TeamName = "Juventus", TeamLeague = "Serie A", TeamStrength = 91, TeamRoster = roster });
 
 
-            for (int i = 2; i < 5; i++)
-            {
-                //myUpdateThread = new Thread(threadStart);
-                delUpdateTextBox dlu = new delUpdateTextBox(updateTextBox);
-                rctConsoleOutput.BeginInvoke(dlu, Environment.NewLine + $"\n---Now simulating {teamList[i].TeamName} v. {teamList[i + 1].TeamName}---", myUpdateThread);
-                //rctConsoleOutput.AppendText(Environment.NewLine + $"\n---Now simulating {teamList[i].TeamName} v. {teamList[i + 1].TeamName}---");
-                //caption = newMatch.simulateMatch(teamList[i].TeamName, teamList[i + 1].TeamName, teamList[i].TeamStrength, teamList[i + 1].TeamStrength);
-                //rctConsoleOutput.AppendText(Environment.NewLine + "Match Result: " + caption);
-                //rctConsoleOutput.AppendText(Environment.NewLine + "Attempting to post to Facebook...");
+            for (int i = 0; i < 5; i++)
+            {    
+                rctConsoleOutput.BeginInvoke(dlu, Environment.NewLine + $"\n---Now simulating {teamList[i].TeamName} v. {teamList[i + 1].TeamName}---");
+                rctConsoleOutput.BeginInvoke(dlu, Environment.NewLine + $"\n---Now simulating {teamList[i].TeamName} v. {teamList[i + 1].TeamName}---");
+                caption = newMatch.simulateMatch(teamList[i].TeamName, teamList[i + 1].TeamName, teamList[i].TeamStrength, teamList[i + 1].TeamStrength);
+                rctConsoleOutput.BeginInvoke(dlu, Environment.NewLine + "Match Result: " + caption);
+                rctConsoleOutput.BeginInvoke(dlu, Environment.NewLine + "Attempting to post to Facebook...");
 
                 //postToFbText(token, caption);
                 
-
-                //imagePath = newMatch.generateImage(i, i + 1, MatchSimulation.team1Score, MatchSimulation.team2Score, teamList[i].TeamName, teamList[i + 1].TeamName);
-
-                //BotPost newPost = new BotPost();
-
-                //newPost.postToFbImage(BotPost.FB_PAGE_ID, token, imagePath, caption);
-
+                imagePath = newMatch.generateImage(i, i + 1, MatchSimulation.team1Score, MatchSimulation.team2Score, teamList[i].TeamName, teamList[i + 1].TeamName);
+                imagePath = newMatch.generateImage(i, i + 1, MatchSimulation.team1Score, MatchSimulation.team2Score, teamList[i].TeamName, teamList[i + 1].TeamName);
+                newPost.postToFbImage(BotPost.FB_PAGE_ID, token, imagePath, caption);
+                          
                 string time = DateTime.Now.ToString("h:mm:ss:ffff tt");
 
-                //rctConsoleOutput.AppendText(Environment.NewLine + $"Match simulation has been posted to Facebook @ {time}. Next simulation will be run in 1 minute(s)...");
+                rctConsoleOutput.BeginInvoke(dlu, Environment.NewLine + $"Match simulation has been posted to Facebook @ {time}. Next simulation will be run in 5 minute(s)...");
+
                 if (i == 5) { break; }
-                await Task.Delay(10000);
-                if (simStop == true) { rctConsoleOutput.AppendText($"\n\nSimulation Terminated @{DateTime.Now.ToString("h:mm:ss:ff tt")}"); btnRandomSim.Enabled = true; break; }
 
+                Stopwatch timer = new Stopwatch();
+                timer.Start();
+                while (timer.Elapsed.TotalSeconds < 300){}
+                timer.Stop();
 
+                //await Task.Delay(10000);
+
+                if (simStop == true) { rctConsoleOutput.BeginInvoke(dlu, $"\n\nSimulation Terminated @{DateTime.Now.ToString("h:mm:ss:ff tt")}"); btnRandomSim.Enabled = true; break; }
             }
 
-            rctConsoleOutput.AppendText(Environment.NewLine + "\n---All simulations completed---");
+            rctConsoleOutput.BeginInvoke(dlu, Environment.NewLine + "\n---All simulations completed---");
             btnRandomSim.Enabled = true;
         }
 
@@ -142,7 +149,6 @@ namespace DDCBot6000GUI
         {
             this.rctConsoleOutput.AppendText(txt);
         }
-
 
         private void btnSubmitToken_Click(object sender, EventArgs e)
         {

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.lblAccessToken = new System.Windows.Forms.Label();
             this.txtAccessToken = new System.Windows.Forms.TextBox();
             this.btnSubmitToken = new System.Windows.Forms.Button();
@@ -58,6 +59,7 @@
             this.btnStop = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.llbaberuwu = new System.Windows.Forms.LinkLabel();
+            this.tmr = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
@@ -438,6 +440,10 @@
             this.llbaberuwu.Text = "@aberuwu";
             this.llbaberuwu.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.llbaberuwu_LinkClicked);
             // 
+            // tmr
+            // 
+            this.tmr.Enabled = true;
+            // 
             // frmMain
             // 
             this.AcceptButton = this.btnSubmitToken;
@@ -521,6 +527,7 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.LinkLabel llbaberuwu;
         public System.Windows.Forms.RichTextBox rctConsoleOutput;
+        private System.Windows.Forms.Timer tmr;
     }
 }
 

@@ -1,4 +1,11 @@
-﻿using System;
+﻿///<remarks> 
+/// -Cesar I. Mendoza (aberuwu)
+/// File: MatchSimulation.cs
+/// Purpose: Contains classes and methods for the simulation of matches
+///          
+/// </remarks>
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
@@ -28,6 +35,14 @@ namespace DDCBot6000GUI
     class MatchSimulation
     {
         public static int team1Score, team2Score;
+        private static int t1winCount = 0;
+        private static int t2winCount = 0;
+        private static int drawCount = 0;
+
+        public int T1winCount { get => t1winCount; set => t1winCount = value; }
+        public int T2winCount { get => t2winCount; set => t2winCount = value; }
+        public int DrawCount { get => drawCount; set => drawCount = value; }
+
         ///<remarks> 
         /// simulateMatch
         /// Return value: String
@@ -39,6 +54,7 @@ namespace DDCBot6000GUI
         /// 
         public string simulateMatch(string team1, string team2, int str1, int str2)
         {
+           
             int winChance = 0;
             int drawChance = 0;
             int result = 0;
@@ -75,6 +91,8 @@ namespace DDCBot6000GUI
                 team1Score = st1;
                 team2Score = st2;
 
+                T1winCount += 1;
+
                 return ($"---Match Simulation---\n{team1} vs. {team2} - {team1} wins! \nScore: {st1} - {st2}");
             }
             else if (result == 0)
@@ -92,6 +110,8 @@ namespace DDCBot6000GUI
                 team1Score = st1;
                 team2Score = st2;
 
+                T2winCount += 1;
+
                 return ($"---Match Simulation---\n{team1} vs. {team2} - {team2} wins! \nScore: {st1} - {st2}");
             }
             else
@@ -99,6 +119,7 @@ namespace DDCBot6000GUI
                 st2 = st1;
                 team1Score = st1;
                 team2Score = st2;
+                DrawCount += 1;
                 return ($"---Match Simulation---\n{team1} vs. {team2} - Both teams draw! \nScore: {st1} - {st2}");
             }
         }
